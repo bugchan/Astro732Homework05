@@ -1,0 +1,38 @@
+\section{Collisionless Boltzmann \\Equation}
+
+% Show that in a frame that rotates with constant angular velocity $\mathbf{\Omega}$,
+% with $\nabla\mathbf{\Phi}_{eff}\equiv\mathbf{\Phi}-\frac{1}{2}|\mathbf{\Omega}\times\mathbf{x}|^2$, the collisionless Boltzmann equation can
+% be written:
+% \begin{equation}
+%     \frac{\partial f}{\partial t}+\mathbf{v}\cdot\nabla f - \left[2(\mathbf{\Omega}\times\mathbf{v})+\nabla\mathbf{\Phi}_{eff}\right]\cdot\frac{\partial f}{\partial \mathbf{v}}=0
+% \end{equation}
+% [Hint: This is B\&T, Problem 4.1 on page 387.]
+
+The continuity equation is
+\begin{equation}
+    \frac{\partial f}{\partial t} + \frac{\partial}{\partial w}\cdot (f\Dot{w})=0
+\end{equation}
+where we can consider $w=(p,q)$ as any arbitrary system of canonical coordinates \cite{BT2008} and $\Dot{w}\mathrm{is}(\Dot{p},\Dot{q})$. 
+ 
+In a rotating frame, the canonical coordinates are $w=(x,v)$ and $\Dot{w}=(\Dot{x},\Dot{v})$ so the continuity equation is given by
+\begin{align*}
+    &\frac{\partial f}{\partial t} + \frac{\partial}{\partial \mathbf{w}}\cdot (f\Dot{\mathbf{w}})=0\\
+    &\frac{\partial f}{\partial t} + \frac{\partial}{\partial \mathbf{x}}\cdot (f\Dot{\mathbf{x}})+ \frac{\partial}{\partial \mathbf{v}}\cdot (f\Dot{\mathbf{v}})=0\\
+    &\frac{\partial f}{\partial t} + \frac{\partial f}{\partial \mathbf{x}}\cdot \Dot{\mathbf{x}} +\frac{\partial \dot{\mathbf{x}}}{\partial \mathbf{x}}\cdot f + \frac{\partial f}{\partial \mathbf{v}}\cdot \Dot{\mathbf{v}} + \frac{\partial \Dot{\mathbf{v}}}{\partial \mathbf{v}}\cdot f=0\\
+    &\frac{\partial f}{\partial t} + \nabla f\cdot\Dot{\mathbf{x}} + \frac{\partial f}{\partial \mathbf{v}}\cdot \Dot{\mathbf{v}}=0.\numberthis{\label{eq:cont}}
+\end{align*}
+where 
+\begin{align*}
+    \mathbf{v}&=\dot{\mathbf{x}}\\
+    \dot{\mathbf{v}}&=\Ddot{\mathbf{x}}=-\nabla\mathbf{\Phi} - 2\mathbf{\Omega}\times\dot{\mathbf{x}}-\mathbf{\Omega}\times(\mathbf{\Omega}\times\mathbf{x})\\
+    &= -\nabla\mathbf{\Phi}_{eff} - 2\mathbf{\Omega}\times\dot{\mathbf{v}}
+\end{align*}
+
+Substituting the last equations into the continuity equation \ref{eq:cont} and  we get
+\begin{align*}
+    &\frac{\partial f}{\partial t} + \nabla f\cdot \mathbf{v} + \frac{\partial f}{\partial \mathbf{v}}\cdot (-\nabla\Phi_{eff} - 2\mathbf{\Omega}\times\dot{\mathbf{x}}) =0\\
+    &\frac{\partial f}{\partial t}+\mathbf{v}\cdot\nabla f - \left(2\mathbf{\Omega}\times\mathbf{v}+\nabla\mathbf{\Phi}_{eff}\right)\cdot\frac{\partial f}{\partial \mathbf{v}}=0
+\end{align*}
+
+
+

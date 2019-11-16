@@ -1,0 +1,162 @@
+\documentclass[12pt,letterpaper]{article}
+\usepackage{fullpage}
+\usepackage[top=2cm, bottom=4cm, left=2cm, right=2cm]{geometry}
+\usepackage{amsmath,amsthm,amsfonts,amssymb,amscd}
+\usepackage{lastpage}
+\usepackage{enumerate}
+\usepackage{fancyhdr}
+\usepackage{mathrsfs}
+\usepackage{xcolor}
+\usepackage{graphicx}
+\usepackage{listings}
+\usepackage{hyperref}
+\usepackage{siunitx} % Formats the units and values
+\usepackage{appendix}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{multicol}
+\usepackage{wrapfig}
+\usepackage{esint}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[inline]{enumitem} %allows inline itemize or enumerate
+\usepackage{pdfpages}
+\usepackage{booktabs} % For \toprule, \midrule and \bottomrule
+\usepackage{pgfplotstable} % Generates table from .csv
+\pgfplotsset{compat=1.16}
+% Setup siunitx:
+ \sisetup{
+   round-mode          = places, % Rounds numbers
+   round-precision     = 2, % to 2 places
+ }
+
+
+\hypersetup{%
+  colorlinks=true,
+  linkcolor=blue,
+  linkbordercolor={0 0 1}
+}
+ 
+\renewcommand\lstlistingname{Algorithm}
+\renewcommand\lstlistlistingname{Algorithms}
+\def\lstlistingautorefname{Alg.}
+
+\lstdefinestyle{Python}{
+    language        = Python,
+    frame           = lines, 
+    basicstyle      = \tiny,
+    keywordstyle    = \color{blue},
+    stringstyle     = \color{green},
+    commentstyle    = \color{orange}\ttfamily
+}
+
+\setlength{\parindent}{0.0in}
+\setlength{\parskip}{0.1in}
+\setlength{\tabcolsep}{6pt}
+
+%Astronomical units
+\DeclareSIUnit \parsec  {pc}
+\DeclareSIUnit \year    {yr}
+
+% Edit these as appropriate
+\newcommand\course{ASTRO 732}
+\newcommand\coursename{Computational Methods for Astrophysics}
+% \newcommand\course{ASTRO 645}
+% \newcommand\coursename{Astrophysical Dynamics}
+\newcommand\hwnumber{5}
+\newcommand\myname{Sandra Bustamante}  
+%allows to number the last equation of align.
+\newcommand\numberthis{\addtocounter{equation}{1}\tag{\theequation}}
+
+\pagestyle{fancyplain}
+\headheight 35pt
+\lhead{\course \\ Homework \hwnumber}
+\chead{\textbf{\Large Liouville and Boltzmann}}
+%\rhead{\myname \\ Due October 29, 2019}
+\rhead{\myname}
+\lfoot{}
+\cfoot{\coursename}
+\rfoot{\small\thepage}
+\headsep 1.5em
+
+%redefines subsections to be letters instead of numbers so 1.a normal way is 1.1
+% \arabic (1, 2, 3, ...)
+% \alph (a, b, c, ...)
+% \Alph (A, B, C, ...)
+% \roman (i, ii, iii, ...)
+% \Roman (I, II, III, ...)
+\renewcommand\thesubsection{\thesection.\alph{subsection}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%=====================BEGIN DOCUMENT===========================
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+\twocolumn
+\lstset{style=Python}
+
+% textwidth is \the\textwidth \\
+% column width is \the\columnwidth \\
+% textheight is \the\textheight
+
+\input{problem1.tex}
+% % %\include{name} %name without extension. insert in new page
+% \newpage %continues on next column
+% %\clearpage %continues on next page
+
+% \input{problem2.tex}
+% \newpage
+
+% \input{problem3.tex}
+% \newpage
+
+% \input{problem4.tex}
+% \newpage
+
+% \input{problem5.tex}
+% \newpage
+
+% \input{problem6.tex}
+%\newpage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%=====================Add Bibliography=========================
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% \bibliographystyle{plain} % We choose the "plain" reference style
+% %plain style sorts the reference list by alphabetical order of the first author’s last name.
+% \bibliography{references} % Entries are in the "refs.bib" file
+
+% \clearpage
+
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% %=====================Appendix=================================
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%  \appendix
+
+% \section[]{Python code} 
+% \lstset{caption={Astro645HW05p2.py}, style=Python}
+% %\label{sec:CodeHw04p1}
+% %\lstset{label={Astro732Hw04P1.py}}
+% \lstinputlisting[language=Python]{CodeAndFigures/Astro645HW05p2.py}
+
+% \newpage
+
+% %\section[]{Python code Problem 3} 
+% \lstset{caption={SetupPlots.py}, style=Python}
+% \lstinputlisting[language=Python]{CodeAndFigures/SetupPlots.py}
+
+% \newpage
+
+% %\section[]{Python code Problem 4} 
+% \lstset{caption={NumericIntegrations.py}, style=Python}
+% \lstinputlisting[language=Python]{CodeAndFigures/NumericIntegrations.py}
+
+% \newpage
+
+% %\section[]{Python code Problem 5} 
+% \lstset{caption={Astro645HW04p5.py}, style=Python}
+% \lstinputlisting[language=Python]{CodeAndFigures/Astro645HW04p5.py}
+
+
+\end{document}
