@@ -22,19 +22,24 @@ def linfit(y,x,yerr):
     Y= np.dot(A.T,np.dot(Cinv,y))
     A= np.dot(A.T,np.dot(Cinv,A))
     return (np.linalg.solve(A,Y),np.linalg.inv(A))
-  
+
 def lnprob(x,data):
     # Parameters: m,b,Pb,Yb,lnVb
+    xdata=data[:,1]
+    ydata=data[:,2]
+    sigmay=data[:,3]
+
     if x[2] < 0: return -1000000000000.
     if x[2] > 1: return -1000000000000.
     if np.exp(x[4]/2.) > 10000.:  return -1000000000000.
     if np.exp(x[4]/2.) < 1.:  return -1000000000000.
     return np.sum(\
-        np.log((1.-x[2])/data[:,3]*np.exp(-0.5*(data[:,2]-x[0]*data[:,1]-x[1])**2./\
-                                               data[:,3]**2.)
-                 +x[2]/np.sqrt(data[:,3]**2.+np.exp(x[4]))\
-                         *np.exp(-0.5*(data[:,2]-x[3])**2./(data[:,3]**2.+np.exp(x[4])))))
-  
+        np.log((1.-x[2])/sigmay*\
+               np.exp(-0.5*\
+                      (ydata-x[0]*xdata-x[1])**2./sigmay**2.)
+                 + x[2]/np.sqrt(sigmay**2.+np.exp(x[4]))\
+                         *np.exp(-0.5*(ydata-x[3])**2./(sigmay**2.+np.exp(x[4])))))
+
 #%%
 data= np.array([[1,201,592,61,9,-0.84],
                    [2,244,401,25,4,0.31],
@@ -56,18 +61,22 @@ data= np.array([[1,201,592,61,9,-0.84],
                    [18,125,334,26,8,0.40],
                    [19,218,533,16,6,-0.78],
                    [20,146,344,22,5,-0.56]])
-  
-#%% 
+
+#%%
 nwalkers= 20
 # Start from best-fit line above
+
 X, Xcov= linfit(data[4:,2],data[4:,1],data[4:,3])
 p0= [[X[0]+np.random.normal()*np.sqrt(Xcov[0,0]),
       X[1]+np.random.normal()*np.sqrt(Xcov[1,1]),
       0.3+(np.random.uniform()/5.-0.1),
-      np.mean(data[:,2])+np.random.normal()*np.std(data[:,2])/4.,
-     (2.*np.log(np.std(data[:,2]))*(1.+0.1*np.random.normal()))]
+      np.mean(data[:,2])+np.random.normal()\
+      *np.std(data[:,2])/4.,
+     (2.*np.log(np.std(data[:,2]))\
+      *(1.+0.1*np.random.normal()))]
     for w in range(nwalkers)]
-sampler = emcee.EnsembleSampler(nwalkers,len(p0[0]),lnprob,args=[data])
+sampler = emcee.EnsembleSampler(nwalkers,len(p0[0]),
+                                lnprob,args=[data])
 # Burn=in
 pos, prob, state = sampler.run_mcmc(p0,1000)
 sampler.reset()
@@ -75,6 +84,8 @@ pos, prob, state= sampler.run_mcmc(pos,10000)
 
 #%%
 fig = corner.corner(sampler.flatchain[::10],
-                    labels=["$m$", "$b$", "$P_b$", "$Y_b$","$\ln\,V_b$"],
-                    range=[(1.8,2.8),(-50.,150.),(0.,1.),(0.,800.),(0.,14.)],
+                    labels=["$m$", "$b$", "$P_b$",
+                            "$Y_b$","$\ln\,V_b$"],
+                    range=[(1.8,2.8),(-50.,150.),(0.,1.),
+                           (0.,800.),(0.,14.)],
                     show_titles=True)
