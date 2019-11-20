@@ -12,6 +12,9 @@ import matplotlib.pyplot as plt
 import scipy.optimize as opt
 import corner
 import time
+import emcee
+
+#%% Definitions
 
 def linearModel(x,a0,a1):
   return a0+a1*x
@@ -64,7 +67,7 @@ def MCMCHastings(N,width,params,model,x,y,sigma):
     return aArray
 
 
-#%% Linear FIT
+#%% Linear Model Import Data
 
 # import data
 data1=np.load('linfit_data.npz')
@@ -80,25 +83,60 @@ sigma1=data1['sigma']
 #using curve fit to find my initial guess
 coeff1,pcov1=opt.curve_fit(linearModel,x1,y1,sigma=sigma1)
 
-#start with pcov as width and then optimize according to acceptance rate
+#%% Linear Model Metropolis Hastings
+#start with pcov as width and then optimize according to acceptance rate = 23.4
 N=10000
+nwalkers1=20
+#width=4.9*np.sqrt(np.diag(pcov1))
 width=4.9*pcov1
 accept=0
 
-aArray1=MCMCHastings(N,width,coeff1,linearModel,x1,y1,sigma1)
+aArray1=MCMCHastings(nwalkers1*N,width,
+                     coeff1,linearModel,x1,y1,sigma1)
 
-# Make plot of parameters
-fig1=corner.corner(aArray1[500:],
+#%% Linear Model Plot Metropolis Hastings
+fig1=corner.corner(aArray1[::10],
                    labels=['$a_0$','$a_1$'],
                    show_titles=True,
                    levels=(0.683,0.95),
                    color='C0',
-                   title="Linear Model,Metropolis-Hastings",
+                   title="Linear Model Metropolis-Hastings",
                    #truths=coeff,
                    )
-plt.savefig('LinearFitMetropolisHastings.pdf')
+plt.savefig('LinearModelMetropolisHastings.pdf')
 
-#%% Gaussian Fit
+#%% Linear Model Emcee Algorithm
+
+p01= [[coeff1[0]+np.random.normal()*np.sqrt(pcov1[0,0]),
+      coeff1[1]+np.random.normal()*np.sqrt(pcov1[1,1])]
+      for w in range(nwalkers1)]
+#p0= [np.random.multivariate_normal(coeff1,pcov1)
+#      for w in range(nwalkers)]
+
+start=time.time()
+
+sampler1=emcee.EnsembleSampler(nwalkers1,len(p01[0]),
+                      logPi,args=[y1,x1,sigma1,linearModel])
+pos1, prob1, state1 = sampler1.run_mcmc(p01,1000)
+sampler1.reset()
+pos1, prob1, state1= sampler1.run_mcmc(pos1,N)
+
+end = time.time()
+print('Time to run: %0.2f'%(end - start))
+
+
+#%% Linear Model Plot Emcee
+fig3 = corner.corner(sampler1.flatchain[::10],
+                    labels=["$a_0$", "$a_1$"],
+                    show_titles=True,
+                    color='C0',
+                    levels=(0.683,0.95),
+                    title="Linear Model Emcee",
+                    )
+
+plt.savefig('LinearModelEmcee.pdf')
+
+#%% Gaussian Model Import Data
 
 data2=np.load('gaussfit_data.npz')
 #show key of data
@@ -111,33 +149,67 @@ sigma2=data2['sigma'][:30]
 #Visual inspection of data
 #plt.plot(x2,y2)
 
-
 #using curve fit to find my initial guess
 coeff2,pcov2=opt.curve_fit(gaussModel,x2,y2,sigma=sigma2)
 
 #plt.plot(x2,gaussModel(x2,coeff2[0],coeff2[1],
 #                       coeff2[2],coeff2[3]))
 
+#%% Gaussian Model Metropolis Hasting
 #start with pcov as width and then optimize according to acceptance rate
 N=10000
+nwalkers2=20
 width=1.65*pcov2
-#width=.1*np.diag(coeff2)
 accept=0
 
-aArray2=MCMCHastings(N,width,coeff2,gaussModel,x2,y2,sigma2)
-# Make plot of parameters
+aArray2=MCMCHastings(N*nwalkers2,width,
+                     coeff2,gaussModel,x2,y2,sigma2)
+
+#%% Gaussian Model Plot
+
 fig2=corner.corner(aArray2[0:],
                    labels=['$a_0$','$a_1$','$a_2$','$a_3$'],
                    show_titles=True,
                    levels=(0.683,0.95),
                    color='C0',
                    title="Gaussian Model Metropolis-Hastings",
-                   #truths=coeff,
                    )
-plt.savefig('GaussFitMetropolisHastings.pdf')
+plt.savefig('GaussianModelMetropolisHastings.pdf')
 
-fig3=plt.figure()
-grid=plt.GridSpec(4,4)
-ax1=add
+#%% Gaussian Model Emcee Algorithm
+
+
+p02=[[coeff2[0]+np.random.normal()*np.sqrt(pcov2[0,0]),
+      coeff2[1]+np.random.normal()*np.sqrt(pcov2[1,1]),
+      coeff2[2]+np.random.normal()*np.sqrt(pcov2[2,2]),
+      coeff2[3]+np.random.normal()*np.sqrt(pcov2[3,3])]
+      for w in range(nwalkers2)]
+#p0= [np.random.multivariate_normal(coeff1,pcov1)
+#      for w in range(nwalkers)]
+
+start=time.time()
+sampler2=emcee.EnsembleSampler(nwalkers2,len(p02[0]),
+                      logPi,args=[y2,x2,sigma2,gaussModel])
+
+pos2, prob2, state2 = sampler2.run_mcmc(p02,1000)
+sampler2.reset()
+pos2, prob2, state2= sampler2.run_mcmc(pos2,N)
+
+end = time.time()
+print('Time to run: %0.2f'%(end - start))
+
+#%% Gaussian Model Plot Emcee Algorithm
+fig3 = corner.corner(sampler2.flatchain[::10],
+                    labels=['$a_0$','$a_1$','$a_2$','$a_3$'],
+                    show_titles=True,
+                    color='C0',
+                    levels=(0.683,0.95),
+                    title="Linear Model Emcee",
+                    )
+
+plt.savefig('gaussianModelEmcee.pdf')
+
+
+
 
 
