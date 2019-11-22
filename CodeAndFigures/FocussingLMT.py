@@ -17,6 +17,7 @@ from astropy.io import fits
 import matplotlib.pyplot as plt
 import time
 import lmfit
+import SetupPlots as SP
 
 #%% Definitions
 
@@ -33,10 +34,10 @@ def gauss2d(x,y,x0,y0,sigmax,sigmay,theta,A):
   return A*np.exp(-a*(x-x0)**2-b*(x-x0)*(y-y0)-c*(y-y0)**2)
 
 
-
 #%% Import Data
 
 #hdu=fits.open('aztec_2015-02-07_035114_00_0001_maps_signal_unfilt.fits')
+
 s4=fits.getdata('aztec_2015-02-07_035114_00_0001_maps_signal_unfilt.fits')
 s4=s4[:,3:315]
 w4=fits.getdata('aztec_2015-02-07_035114_00_0001_maps_weight_unfilt.fits')
@@ -50,6 +51,10 @@ w7=fits.getdata('aztec_2015-02-07_035117_00_0001_maps_weight_unfilt.fits')
 s8=fits.getdata('aztec_2015-02-07_035118_00_0001_maps_signal_unfilt.fits')
 w8=fits.getdata('aztec_2015-02-07_035118_00_0001_maps_weight_unfilt.fits')
 
+signals=[s4,s5,s6,s7,s8]
+weights=[w4,w5,w6,w7,w8]
+paramslabels=['x0','y0','sigmax','sigmay','theta','A']
+
 z=np.array([-3.0,-2.0,-1.0,0.0,1.0])
 ylen,xlen=s4.shape
 x=np.arange(xlen)
@@ -57,35 +62,57 @@ y=np.arange(ylen)
 x,y=np.meshgrid(x,y)
 
 #%%
+start=time.time()
 gaussModel=lmfit.Model(gauss2d,
                        independent_vars=('x','y'),
-      param_names=('x0','y0','sigmax','sigmay','theta','A'),
+      param_names=paramslabels,
       nan_policy='omit')
 
-result=gaussModel.fit(data=s4,weights=w4,
-                      x=x,y=y,
-                      x0=156,y0=177,
-                      sigmax=1,sigmay=1,
-                      theta=0,A=1)
-covar=result.covar
-bestValues=result.best_values
-j=0
-valuesArray=np.zeros(len(bestValues))
-valuesNames=['']*len(bestValues)
-for i in bestValues:
-  valuesArray[j]=bestValues[i]
-  valuesNames[j]=i
-  j+=1
+titles=['Raw','Fit','Residuals']
+valuesArray=np.zeros((5,6))
+fits=np.zeros(np.shape(signals))
+covarArray=np.zeros((5,6,6))
 
-plt.imshow(gauss2d(x,y,*valuesArray))
+for i in np.arange(5):  
+  result=gaussModel.fit(data=signals[i],
+                        weights=weights[i],
+                        x=x,y=y,
+                        x0=156,y0=177,
+                        sigmax=1,sigmay=1,
+                        theta=0,A=1)
+  covarArray[i]=result.covar
+  valuesArray[i]=np.array([*result.best_values.values()])
+  fits[i]=gauss2d(x,y,*valuesArray[i])
 
-#plt.imshow(x, y, s4)
-#plt.imshow(x,y,result.best_fit)
-#
-#plt.plot(x, result.init_fit, 'k--', label='initial fit')
-#plt.plot(x, result.best_fit, 'r-', label='best fit')
-#plt.legend(loc='best')
+residuals=signals-fits
 
+end=time.time()
+print('time',(end-start))
 
+#%%
+width,height=SP.setupPlot(singleColumn=True)
+grid = plt.GridSpec(1,3)
 
+for i in range(5):
+  fig,axs = plt.subplots(1,3,figsize=(width,height))
+  axs[0].imshow(signals[i])
+  axs[0].set_title('Raw')
+  axs[0].set_aspect('equal')
+  
+  axs[1].imshow(fits[i])
+  axs[1].set_title('Fit')
+  axs[1].set_aspect('equal')
+  
+  axs[2].imshow(residuals[i])
+  axs[2].set_title('Residual')
+  axs[2].set_aspect('equal')
+  
+  fig.tight_layout()
+  fig.savefig('DataFits%i.pdf'%(i+4))
 
+#%%
+width,height=SP.setupPlot(singleColumn=False)
+fig,axs = plt.subplots(1,1,figsize=(width,height))
+axs.plot(z,valuesArray[:,-1],'-o')
+
+#falta hacer el fit to a gaussian.
