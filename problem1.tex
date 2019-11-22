@@ -1,13 +1,13 @@
-\section{Gauss-Laguerre Integration}
+\section{Gauss-Laguerre \\ Integration}
 
 The convolution of an exponential decay and a Gaussian resolution function is given by
 \begin{equation}
     f(t)=\int^\infty_0 \frac{e^{\frac{-(t-t')^2}{2\sigma^2_t}}}{\sqrt{2\pi\sigma^2_t}}\frac{e^{\frac{-t'}{\tau}}}{\tau}dt'
 \end{equation}
 
-Evaluate this integral using Gauss-Laguerre quadrature for $\tau=1,\sigma_t=0.5$ and at 100 points for $t\in[-2,6]$. Use $N=5,10,15,20,\mathrm{and}30$ knots and compute both the relative and absolute
+Evaluate this integral using Gauss-Laguerre \\ quadrature for $\tau=1,\sigma_t=0.5$ and at 100 points for $t\in[-2,6]$. Use $N=5,10,15,20,$ and $30$ knots and compute both the relative and absolute
 error using the analytic solution
 \begin{equation}
-    f(t)=\frac{1}{2\tau}\exp{\left(\frac{\sigma^2_t}{2\tau^2}-\frac{t}{\tau}\right)}\mathrm{erfc}\left(\frac{\sigma_t}{\sqrt{2}\tau}-\frac{t}{\sqrt{2}\sigma_t}\right).
+    f(t)=\frac{1}{2\tau}e^{\left(\frac{\sigma^2_t}{2\tau^2}-\frac{t}{\tau}\right)}\mathrm{erfc}\left(\frac{\sigma_t}{\sqrt{2}\tau}-\frac{t}{\sqrt{2}\sigma_t}\right).
 \end{equation}
 
