@@ -45,8 +45,12 @@ def MCMCHastings(N,width,params,model,x,y,sigma):
 
       logpi_prev=logPi(aArray[i-1],y,x,sigma,model)
       logpi_cand=logPi(cand,y,x,sigma,model)
+      print('logpi prev',logpi_prev)
+      print('logpicand',logpi_cand)
       #calculate the acceptance probability
-      acceptanceprob=min(1,np.exp(logpi_cand-logpi_prev))
+      ratio=np.exp(logpi_cand-logpi_prev)
+      print('ratio',ratio)
+      acceptanceprob=min(1,ratio)
       #print(acceptanceprob)
       #generate a random number from uniform distribution
       u=np.random.uniform()
@@ -85,7 +89,7 @@ coeff1,pcov1=opt.curve_fit(linearModel,x1,y1,sigma=sigma1)
 
 #%% Linear Model Metropolis Hastings
 #start with pcov as width and then optimize according to acceptance rate = 23.4
-N=10000
+N=100
 nwalkers1=20
 #width=4.9*np.sqrt(np.diag(pcov1))
 width=4.9*pcov1
