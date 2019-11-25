@@ -71,7 +71,7 @@ absError=np.abs(real-integralArray)
 width,height=SP.setupPlot(singleColumn=False)
 
 fig,axs = plt.subplots(3,1,
-                       figsize=(width,3*height),
+                       figsize=(width,2*height),
                        sharex=True,
                        gridspec_kw = {'hspace':0})
 
