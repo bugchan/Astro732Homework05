@@ -31,6 +31,7 @@ def setupPlot(singleColumn):
             'axes.axisbelow' : True,
             'pgf.rcfonts' : False,
             'lines.markersize' : markersize,
+            'figure.autolayout' : True,
             }
   plt.rcParams.update(params)
   return width,height
