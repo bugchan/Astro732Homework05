@@ -25,9 +25,12 @@ The analytic solution plotted is given by
     \label{eq:convAnalytic}
 \end{equation}
 
-Note that at higher values of N the numeric solution gets closer to the analytic solution. This can be seen on the middle and bottom plot which correspond to the relative error and the absolute error, respectively. 
-
-The relative error was calculated $|(analytic-numeric)/analytic|$ while the absolute error by $|analytic-numeric|$.
+The error can be seen on the middle and bottom plot which correspond to the relative error and the absolute error, respectively. The relative error and absolute error was calculated by 
+\begin{align*}
+    |(analytic-numeric)/analytic|, \mathrm{and}\\
+    |analytic-numeric|,
+\end{align*}
+respectively. Note that at higher values of $N$ the numeric solution get smaller relative and absolute error.
 
 \begin{figure}
     \centering
@@ -35,9 +38,3 @@ The relative error was calculated $|(analytic-numeric)/analytic|$ while the abso
     \caption{\emph{Top}: Solution to the integral of equation \ref{eq:convolution} using Gauss-Laguerre quadrature of N degrees for $\tau=1,\sigma_t=0.5$ evaluated at 100 points for $t\in[-2,6]$. \emph{Middle}: Relative error of the analytic solution and numeric solutions. \emph{Bottom}: Absolute error of the analytic solution and numeric solutions.}
     \label{fig:GaussLaguerrePlot}
 \end{figure}
-
-% Evaluate this integral using Gauss-Laguerre \\ quadrature for $\tau=1,\sigma_t=0.5$ and at 100 points for $t\in[-2,6]$. Use $N=5,10,15,20,$ and $30$ knots and compute both the relative and absolute
-% error using
-
-
-
