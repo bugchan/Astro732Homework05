@@ -13,6 +13,7 @@ import scipy.optimize as opt
 import corner
 import time
 import emcee
+import SetupPlots as SP
 
 #%% Definitions
 
@@ -26,7 +27,7 @@ def logPi(params,y,x,yerr,model):
     chi=-((y-model(x,*params))**2)/(2*yerr**2)
     return chi.sum(axis=0)
 
-def MCMCHastings(N,width,params,model,x,y,sigma):
+def MCMCHastings(N,width,params,model,x,y,sigma,debug=False):
     start=time.time()
     #Initialize arrays and variables
     accept=0
@@ -45,11 +46,12 @@ def MCMCHastings(N,width,params,model,x,y,sigma):
 
       logpi_prev=logPi(aArray[i-1],y,x,sigma,model)
       logpi_cand=logPi(cand,y,x,sigma,model)
-      print('logpi prev',logpi_prev)
-      print('logpicand',logpi_cand)
       #calculate the acceptance probability
       ratio=np.exp(logpi_cand-logpi_prev)
-      print('ratio',ratio)
+      if debug:
+        print('logpi prev',logpi_prev)
+        print('logpicand',logpi_cand)
+        print('ratio',ratio)
       acceptanceprob=min(1,ratio)
       #print(acceptanceprob)
       #generate a random number from uniform distribution
@@ -89,7 +91,7 @@ coeff1,pcov1=opt.curve_fit(linearModel,x1,y1,sigma=sigma1)
 
 #%% Linear Model Metropolis Hastings
 #start with pcov as width and then optimize according to acceptance rate = 23.4
-N=100
+N=10000
 nwalkers1=20
 #width=4.9*np.sqrt(np.diag(pcov1))
 width=4.9*pcov1
@@ -99,6 +101,7 @@ aArray1=MCMCHastings(nwalkers1*N,width,
                      coeff1,linearModel,x1,y1,sigma1)
 
 #%% Linear Model Plot Metropolis Hastings
+width,height=SP.setupPlot(singleColumn=False)
 fig1=corner.corner(aArray1[::10],
                    labels=['$a_0$','$a_1$'],
                    show_titles=True,
@@ -107,7 +110,8 @@ fig1=corner.corner(aArray1[::10],
                    title="Linear Model Metropolis-Hastings",
                    #truths=coeff,
                    )
-plt.savefig('LinearModelMetropolisHastings.pdf')
+fig1.set_size_inches((width,width))
+fig1.savefig('LinearModelMetropolisHastings.pdf')
 
 #%% Linear Model Emcee Algorithm
 
@@ -137,8 +141,8 @@ fig3 = corner.corner(sampler1.flatchain[::10],
                     levels=(0.683,0.95),
                     title="Linear Model Emcee",
                     )
-
-plt.savefig('LinearModelEmcee.pdf')
+fig3.set_size_inches((width,width))
+fig3.savefig('LinearModelEmcee.pdf')
 
 #%% Gaussian Model Import Data
 
@@ -170,7 +174,7 @@ aArray2=MCMCHastings(N*nwalkers2,width,
                      coeff2,gaussModel,x2,y2,sigma2)
 
 #%% Gaussian Model Plot
-
+width,height=SP.setupPlot(singleColumn=True)
 fig2=corner.corner(aArray2[0:],
                    labels=['$a_0$','$a_1$','$a_2$','$a_3$'],
                    show_titles=True,
@@ -178,7 +182,8 @@ fig2=corner.corner(aArray2[0:],
                    color='C0',
                    title="Gaussian Model Metropolis-Hastings",
                    )
-plt.savefig('GaussianModelMetropolisHastings.pdf')
+fig2.set_size_inches((width,width))
+fig2.savefig('GaussianModelMetropolisHastings.pdf')
 
 #%% Gaussian Model Emcee Algorithm
 
@@ -203,15 +208,15 @@ end = time.time()
 print('Time to run: %0.2f'%(end - start))
 
 #%% Gaussian Model Plot Emcee Algorithm
-fig3 = corner.corner(sampler2.flatchain[::10],
+fig4 = corner.corner(sampler2.flatchain[::10],
                     labels=['$a_0$','$a_1$','$a_2$','$a_3$'],
                     show_titles=True,
                     color='C0',
                     levels=(0.683,0.95),
                     title="Linear Model Emcee",
                     )
-
-plt.savefig('gaussianModelEmcee.pdf')
+fig4.set_size_inches((width,width))
+fig4.savefig('gaussianModelEmcee.pdf')
 
 
 
