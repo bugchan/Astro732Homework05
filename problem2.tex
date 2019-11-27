@@ -14,3 +14,27 @@ that you have faithfully sampled from the distribution. Finally, for each case s
 inefficiency factor (the number of trials you have to make divided by the number of good deviates
 that you get) is equal to the area under $f(x)$ on the interval $[0,\pi]$. Note that the function that
 you choose must have an efficiency factor that is smaller than that of the constant function.
+
+
+\begin{table}
+    \centering
+    \input{CodeAndFigures/AcceptanceRejectionTable.tex}
+    \caption{Table that shows the total area and the inefficiency factor.}
+    \label{tab:accRej}
+\end{table}
+
+\begin{figure}
+  \centering
+  \begin{subfigure}[b]{0.5\textwidth}
+    \includegraphics{CodeAndFigures/AcceptanceRejectionPlotf1.pdf}
+    \caption{$f(x)=0.6$}
+    \label{subfig:constant}
+  \end{subfigure}
+  \begin{subfigure}[b]{0.5\textwidth}
+    \includegraphics{CodeAndFigures/AcceptanceRejectionPlotf2.pdf}
+    \caption{$f(x)=-.2x^2+.2x+.01$.}
+    \label{subfig:Quadratic}
+  \end{subfigure}
+  \caption{Plot of random deviates from a normalized sine function using the Acceptance/Rejection Method with \ref{subfig:Quadratic} quadratic function and \ref{subfig:constant} constant function.}
+  \label{fig:accRejPlot}
+\end{figure}
