@@ -124,11 +124,11 @@ end=time.time()
 print('Quad fit w/ SVD took ',(end-start))
 
 #%%
-width,height=SP.setupPlot(singleColumn=True)
+width,height=SP.setupPlot(singleColumn=False)
 grid = plt.GridSpec(1,3)
 
 for i in range(5):
-  fig,axs = plt.subplots(1,3,figsize=(width,.5*height))
+  fig,axs = plt.subplots(1,3,figsize=(width,height))
   axs[0].imshow(signals[i])
   axs[0].set_title('Raw')
   axs[0].set_aspect('equal')
@@ -142,7 +142,7 @@ for i in range(5):
   axs[1].set_yticks([])
 
   axs[2].imshow(residuals[i])
-  axs[2].set_title('Residual')
+  axs[2].set_title('Residuals')
   axs[2].set_aspect('equal')
   axs[2].set_xticks([])
   axs[2].set_yticks([])
