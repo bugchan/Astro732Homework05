@@ -52,9 +52,9 @@ w7=fits.getdata('aztec_2015-02-07_035117_00_0001_maps_weight_unfilt.fits')
 s8=fits.getdata('aztec_2015-02-07_035118_00_0001_maps_signal_unfilt.fits')
 w8=fits.getdata('aztec_2015-02-07_035118_00_0001_maps_weight_unfilt.fits')
 
+#weights are 1/sigma^2
 signals=[s4,s5,s6,s7,s8]
 weights=[w4,w5,w6,w7,w8]
-
 paramslabels=['x0','y0','sigmax','sigmay','theta','A']
 
 #initialize x and y coordinates
@@ -62,6 +62,8 @@ ylen,xlen=s4.shape
 x=np.arange(xlen)
 y=np.arange(ylen)
 x,y=np.meshgrid(x,y)
+
+
 
 #%% Gaussian Fit to pointing images
 #Initialize the gaussian model
@@ -72,7 +74,7 @@ gaussModel=lmfit.Model(gauss2d,
       param_names=paramslabels,
       nan_policy='omit')
 
-
+#initializes arrays
 valuesArray=np.zeros((5,6))
 fits=np.zeros(np.shape(signals))
 covarArray=np.zeros((5,6,6))
@@ -85,7 +87,9 @@ for i in np.arange(5):
                         sigmax=1,sigmay=1,
                         theta=0,A=1)
   covarArray[i]=result.covar
+  #get the values out of the dictionary
   valuesArray[i]=np.array([*result.best_values.values()])
+  #creates an array of the fits
   fits[i]=gauss2d(x,y,*valuesArray[i])
 
 residuals=signals-fits
@@ -103,10 +107,13 @@ start=time.time()
 quadM=lmfit.Model(quadModel,
                   independent_vars=('z'),
                   param_names=['a0','a1','a2'])
-quadfit=quadM.fit(data=amps,z=z,y=amps,a0=1,a1=1,a2=1)
+quadfit=quadM.fit(data=amps,z=z,a0=1,a1=1,a2=1)
 quadBestValues=np.array([*quadfit.best_values.values()])
-zfit=np.linspace(-3,1,20)
+zfit=np.linspace(-3,1,100)
 quadfitResult=quadModel(zfit,*quadBestValues)
+#find the z position of the maximum value
+index=np.argmax(quadfitResult)
+zPosition=zfit[index-1:index+2]
 end=time.time()
 print('Quad fit with lmfit took ',(end-start))
 
