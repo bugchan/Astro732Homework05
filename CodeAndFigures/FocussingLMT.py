@@ -128,7 +128,7 @@ width,height=SP.setupPlot(singleColumn=False)
 grid = plt.GridSpec(1,3)
 
 for i in range(5):
-  fig,axs = plt.subplots(1,3,figsize=(width,height))
+  fig,axs = plt.subplots(1,3,figsize=(width,.7*height))
   axs[0].imshow(signals[i])
   axs[0].set_title('Raw')
   axs[0].set_aspect('equal')
