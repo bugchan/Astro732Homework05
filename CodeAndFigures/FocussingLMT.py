@@ -28,7 +28,7 @@ def quadModel(z,a0,a1,a2):
 def gauss2d(x,y,x0,y0,sigmax,sigmay,theta,A):
   a=(np.cos(theta)**2)/(2*sigmax**2)\
   + (np.sin(theta)**2)/(2*sigmay**2)
-  b=(np.sin(2*theta))/(2*sigmax**2)\
+  b=-(np.sin(2*theta))/(2*sigmax**2)\
   +(np.sin(2*theta))/(2*sigmay**2)
   c=(np.sin(theta)**2)/(2*sigmax**2)\
   + (np.cos(theta)**2)/(2*sigmay**2)
@@ -62,8 +62,6 @@ ylen,xlen=s4.shape
 x=np.arange(xlen)
 y=np.arange(ylen)
 x,y=np.meshgrid(x,y)
-
-
 
 #%% Gaussian Fit to pointing images
 #Initialize the gaussian model
@@ -109,11 +107,11 @@ quadM=lmfit.Model(quadModel,
                   param_names=['a0','a1','a2'])
 quadfit=quadM.fit(data=amps,z=z,a0=1,a1=1,a2=1)
 quadBestValues=np.array([*quadfit.best_values.values()])
-zfit=np.linspace(-3,1,100)
+zfit=np.linspace(-3,1,1000)
 quadfitResult=quadModel(zfit,*quadBestValues)
-#find the z position of the maximum value
+#find the index of z position of the maximum value
 index=np.argmax(quadfitResult)
-zPosition=zfit[index-1:index+2]
+zPosition=zfit[index]
 end=time.time()
 print('Quad fit with lmfit took ',(end-start))
 
@@ -163,6 +161,10 @@ fig,axs = plt.subplots(1,1,figsize=(width,height))
 axs.errorbar(z,amps,yerr=2*np.sqrt(covarArray[:,5,5]),fmt='.',label='Data Points')
 axs.plot(zfit,quadfitResult,label='LM fit')
 axs.plot(zfit,quadfitSVD,label='SVD fit')
+axs.plot(zfit[index],quadfitResult[index],'*',label='z: %1.2f mm'%zfit[index])
 axs.legend()
+axs.set_xlabel('mm')
+axs.set_ylabel('Amplitude')
+axs.grid()
 
 fig.savefig('QuadFitPlot.pdf')
