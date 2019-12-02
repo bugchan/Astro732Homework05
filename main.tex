@@ -40,7 +40,9 @@ linkbordercolor={0 0 1}}
     basicstyle      = \tiny,
     keywordstyle    = \color{blue},
     stringstyle     = \color{green},
-    commentstyle    = \color{orange}\ttfamily
+    commentstyle    = \color{orange}\ttfamily,
+    breaklines=true,
+    postbreak=\mbox{\textcolor{red}{$\hookrightarrow$}\space},
 }
 \setlength{\parindent}{0.0in}
 \setlength{\parskip}{0.1in}
@@ -126,22 +128,26 @@ linkbordercolor={0 0 1}}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \appendix
 
-\section{Python Codes} 
+\section{Python Code} 
 \lstset{caption={GaussLaguerre.py}, style=Python}
-%\label{sec:CodeHw04p1}
-%\lstset{label={Astro732Hw04P1.py}}
 \lstinputlisting[language=Python]{CodeAndFigures/GaussLaguerre.py}
 \newpage
 
 % %\section[]{Python code Problem 3} 
 \lstset{caption={AcceptanceRejectionMethod.py}, style=Python}
 \lstinputlisting[language=Python]{CodeAndFigures/AcceptanceRejectionMethod.py}
-
 \newpage
 
-\lstset{caption={AcceptanceRejectionMethod.py}, style=Python}
-\lstinputlisting[language=Python]{CodeAndFigures/AcceptanceRejectionMethod.py}
+\lstset{caption={emceeRandomDeviates.py}, style=Python}
+\lstinputlisting[language=Python]{CodeAndFigures/emceeRandomDeviates.py}
+\newpage
 
+\lstset{caption={FocussingLMT.py}, style=Python}
+\lstinputlisting[language=Python]{CodeAndFigures/FocussingLMT.py}
+\newpage
+
+\lstset{caption={MCMC.py}, style=Python}
+\lstinputlisting[language=Python]{CodeAndFigures/MCMC.py}
 \newpage
 
 % %\section[]{Python code Problem 3} 
