@@ -5,15 +5,27 @@ Like all telescopes, the LMT must be focused several times a night.
 To do this we make a small map of a bright point-like source and then adjust the z-position of the secondary mirror until the point spread function (the telescope’s response function) is round and maximized. 
 % In this problem you will focus the telescope using actual data taken on February 7, 2015.
 
-We are given 5 maps of the bright source from February 7, 2015. Along with them, we are given other 5 fits files which are the corresponding weights, $(1/\sigma^2)$. 
+We are given 5 maps of a bright source taken on February 7, 2015. Along with them, we are given other 5 fits files which are the corresponding weights, $(1/\sigma^2)$, of the bright source maps.
 
 We can use the Levenberg-Marquardt (LM) method \footnote{lmfit python package} to fit the point source maps to a 2D Gaussian. The LM method is a way to minimize the $\chi^2$ function using a seamless transition from the steepest descent method (STM) and the inverse Hessian method (IHM).
 
-For this exercise we use the LM method to fit a 2D Gaussian describe by
+The bright source maps can be fitted to a 2D Gaussian described by the following equation
 \begin{equation}
-    
+    f(x,y)=Ae^{-a(x-x_0)^2-b(x-x_0)(y-y_0)-c(y-y_0)^2}
 \end{equation}
-to the maps of the bright source. 
+where 
+\begin{align}
+    a=\frac{\cos^2\theta}{2\sigma_x^2}+\frac{\sin^2\theta}{2\sigma_y^2}\\
+    b=-\frac{\sin 2\theta}{2\sigma_x^2}+\frac{\sin 2\theta}{2\sigma_y^2}\\
+    c=\frac{\sin^2\theta}{2\sigma_x^2}+\frac{\cos^2\theta}{2\sigma_y^2},
+\end{align}
+$A$ is the amplitude, $(x_0,y_0)$ is the center of the peak and $\theta$ is a rotation angle.
+
+We can use LM method by the lmfit python package to find the best parameters that minimizes the $\chi^2$ function. 
+These best values are then use to determine the Gaussian model for each map.
+Figure \ref{fig:lmtRaw} shows the raw maps, the fitted map using the best values of the parameters $A,x_0,y_0,\sigma_x,\sigma_y,$ and $\theta$ and a map of the residuals. 
+
+After this we plot the amplitude obtained from the best fit and its corresponding z-position of the secondary mirror. 
 
 % The data is stored in the file maps.tar.gz on the class Moodle page. You can unpack that on a linux computer with the commands: gunzip maps.tar.gz and tar -xcv maps.tar. This will give you a set of 10 fits files (remember fits from homework 1) that you will read. The files with “signal” in the name are the maps of the source. The files with "weight" in the name are images with each pixel representing the weight $(1/\sigma^2)$ of each pixel in the corresponding signal map.
 
