@@ -19,6 +19,8 @@ import time
 import lmfit
 import SetupPlots as SP
 from scipy import linalg
+import emcee
+import corner
 
 #%% Definitions
 
@@ -34,6 +36,9 @@ def gauss2d(x,y,x0,y0,sigmax,sigmay,theta,A):
   + (np.cos(theta)**2)/(2*sigmay**2)
   return A*np.exp(-a*(x-x0)**2-b*(x-x0)*(y-y0)-c*(y-y0)**2)
 
+def logPi(params,signal,x,y,weight):
+    chi=-((signal-gauss2d(x,y,*params))**2)*weight*0.5
+    return chi.sum(axis=0)
 
 #%% Import Data
 
@@ -101,19 +106,44 @@ amps=valuesArray[:,-1]
 z=np.array([-3.0,-2.0,-1.0,0.0,1.0])
 
 #%% quadFit using lmfit
+#start=time.time()
+#quadM=lmfit.Model(quadModel,
+#                  independent_vars=('z'),
+#                  param_names=['a0','a1','a2'])
+#quadfit=quadM.fit(data=amps,z=z,a0=1,a1=1,a2=1)
+#quadBestValues=np.array([*quadfit.best_values.values()])
+#zfit=np.linspace(-3,1,1000)
+#quadfitResult=quadModel(zfit,*quadBestValues)
+##find the index of z position of the maximum value
+#index=np.argmax(quadfitResult)
+#zPosition=zfit[index]
+#end=time.time()
+#print('Quad fit with lmfit took ',(end-start))
+
+#%% posterior probability for fit1
+walkers=16
+N=1000
+
+p0= [[valuesArray[1,0]+np.random.normal()*np.sqrt(covarArray[1,0,0]),
+      valuesArray[1,1]+np.random.normal()*np.sqrt(covarArray[1,1,1]),
+      valuesArray[1,2]+np.random.normal()*np.sqrt(covarArray[1,2,2]),
+      valuesArray[1,3]+np.random.normal()*np.sqrt(covarArray[1,3,3]),
+      valuesArray[1,4]+np.random.normal()*np.sqrt(covarArray[1,4,4]),
+      valuesArray[1,5]+np.random.normal()*np.sqrt(covarArray[1,5,5])]
+      for w in range(walkers)]
+#p0= [np.random.multivariate_normal(coeff1,pcov1)
+#      for w in range(nwalkers)]
+
 start=time.time()
-quadM=lmfit.Model(quadModel,
-                  independent_vars=('z'),
-                  param_names=['a0','a1','a2'])
-quadfit=quadM.fit(data=amps,z=z,a0=1,a1=1,a2=1)
-quadBestValues=np.array([*quadfit.best_values.values()])
-zfit=np.linspace(-3,1,1000)
-quadfitResult=quadModel(zfit,*quadBestValues)
-#find the index of z position of the maximum value
-index=np.argmax(quadfitResult)
-zPosition=zfit[index]
-end=time.time()
-print('Quad fit with lmfit took ',(end-start))
+
+sampler=emcee.EnsembleSampler(walkers,len(p0[0]),
+                      logPi,args=[signals[1],x,y,weights[1]])
+pos, prob, state = sampler.run_mcmc(p0,N)
+#sampler1.reset()
+#pos, prob, state= sampler.run_mcmc(pos,N)
+
+end = time.time()
+print('Time to run: %0.2f'%(end - start))
 
 #%% quadfit using SVD
 #Reminder of what we have Az*coeff=Amp
@@ -131,28 +161,36 @@ print('Quad fit w/ SVD took ',(end-start))
 #%%
 width,height=SP.setupPlot(singleColumn=False)
 grid = plt.GridSpec(1,3)
+mapcolor='magma'
 
 for i in range(5):
-  fig,axs = plt.subplots(1,3,figsize=(width,.7*height))
-  axs[0].imshow(signals[i])
+  fig,axs = plt.subplots(1,3,figsize=(width,.6*height))
+  cmap1=axs[0].imshow(signals[i],cmap=mapcolor,
+           interpolation='none',vmin=-.4,vmax=1.1)
   axs[0].set_title('Raw')
   axs[0].set_aspect('equal')
   axs[0].set_xticks([])
   axs[0].set_yticks([])
 
-  axs[1].imshow(fits[i])
+  cmap2=axs[1].imshow(fits[i],cmap=mapcolor,
+           interpolation='none',vmin=0,vmax=0.9)
   axs[1].set_title('Fit')
   axs[1].set_aspect('equal')
   axs[1].set_xticks([])
   axs[1].set_yticks([])
 
-  axs[2].imshow(residuals[i])
+  cmap3=axs[2].imshow(residuals[i],cmap=mapcolor,
+           interpolation='none',vmin=-.4,vmax=0.6)
   axs[2].set_title('Residuals')
   axs[2].set_aspect('equal')
   axs[2].set_xticks([])
   axs[2].set_yticks([])
+  
 
   fig.tight_layout()
+  fig.colorbar(cmap1,ax=axs[0])
+  fig.colorbar(cmap2,ax=axs[1])
+  fig.colorbar(cmap3,ax=axs[2])
   fig.savefig('DataFits%i.pdf'%(i+4))
 
 #%%

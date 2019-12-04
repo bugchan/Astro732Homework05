@@ -11,16 +11,27 @@ import emcee
 import matplotlib.pyplot as plt
 
 #%% Definitions
+def logprior(x):
+    xmin=0
+    xmax=np.pi
+    #prob of values outside of range is 0. 
+    lp=np.log(1) if xmin<x<xmax else -np.inf
+    return lp
+
+def loglikelihood(x):
+    return -np.inf
+
+def logposterior(x):
+    return -np.inf
+    
 def probx(x):
-  px=np.zeros(len(x))
-  px[(x>0)*(x<np.pi)]=np.sin(x[(x>0)*(x<np.pi)])/2
-  return px
+  return np.sin(x)/2
 
 def logPi(x,xmean,xsigma):
-  if x<=0:
-    p=-1000000
-  elif x>=np.pi:
-    p=-1000000
+  if x<=0 or x>=np.pi:
+    p=-np.inf
+#  elif x>=np.pi:
+#    p=-1000000
   else:
     p=-((xmean-probx(x))**2)/(2*xsigma**2)
   return p
@@ -35,6 +46,7 @@ px=probx(x)
 
 meanx=np.pi/2
 sigmax=1
+N=10000
 #%% emcee
 ndim, nwalkers = 1, 10
 x0 = np.random.randn(nwalkers, ndim)*meanx+sigmax
@@ -43,14 +55,13 @@ sampler = emcee.EnsembleSampler(nwalkers, ndim,
                                 logPi,
                                 args=[meanx,sigmax])
 
-pos, prob, state = sampler.run_mcmc(x0, 10000)
+pos, prob, state = sampler.run_mcmc(x0,N)
 
 #%%
 
-
 samples = sampler.flatchain
 plt.hist(samples[:, 0], 100,density=True)
-plt.plot(x,probx(x))
-#plt.xlabel(r"$\theta_1$")
-#plt.ylabel(r"$p(\theta_1)$")
-#plt.gca().set_yticks([]);
+plt.plot(x,probx(x),label='sinx/2')
+plt.text(0,0.6,'AcceptanceRate:%1.2f'%sampler.acceptance_fraction.mean())
+plt.legend()
+
