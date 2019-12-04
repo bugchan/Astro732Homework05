@@ -7,7 +7,7 @@ Created on Wed Nov 20 14:26:10 2019
 
 Focussing the LMT
 
-weight: (1/σ2)
+weight: (1/sigma2)
 Putting all this together, use the lmfit Levenberg-Marquardt
 fitting package to fit each image to a 2-d gaussian.
 
