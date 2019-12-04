@@ -82,22 +82,22 @@ gaussModel=lmfit.Model(gauss2d,
 
 #initializes arrays
 ndim=6
-nmaps=5
+nmaps=len(signals)
 valuesArray=np.zeros((nmaps,ndim))
 fits=np.zeros(np.shape(signals))
 covarArray=np.zeros((nmaps,ndim,ndim))
 
-for i in np.arange(5):
+for i in np.arange(nmaps):
   result=gaussModel.fit(data=signals[i],
                         weights=weights[i],
                         x=x,y=y,
                         x0=156,y0=177,
                         sigmax=1,sigmay=1,
-                        A=1)
+                        theta=0,A=1)
   covarArray[i]=result.covar
   #get the values out of the dictionary
   valuesArray[i]=np.array([*result.best_values.values()])
-  #creates an array of the fits
+  #creates an array of fits
   fits[i]=gauss2d(x,y,*valuesArray[i])
 
 residuals=signals-fits
@@ -139,29 +139,64 @@ print('Quad fit w/ SVD took ',(end-start))
 #print('Quad fit with lmfit took ',(end-start))
 
 #%% posterior probability for fit1
-walkers=20
-N=10000
+M=2
+niter=100
 
-p0= [[valuesArray[2,0]+np.random.normal()*np.sqrt(covarArray[2,0,0]),
-      valuesArray[2,1]+np.random.normal()*np.sqrt(covarArray[2,1,1]),
-      valuesArray[2,2]+np.random.normal()*np.sqrt(covarArray[2,2,2]),
-      valuesArray[2,3]+np.random.normal()*np.sqrt(covarArray[2,3,3]),
-      valuesArray[2,4]+np.random.normal()*np.sqrt(covarArray[2,4,4]),
-      valuesArray[2,5]+np.random.normal()*np.sqrt(covarArray[2,5,5])]
-      for w in range(walkers)]
+posteriorParams=np.zeros(niter,ndim)
+posteriorChi=np.zeros(niter)
 
-start=time.time()
+for i in range(niter):
+  #paramslabels=['x0','y0','sigmax','sigmay','theta','A']
+  p0= [valuesArray[M,0]+np.random.normal()*np.sqrt(covarArray[M,0,0]),#x0
+      valuesArray[M,1]+np.random.normal()*np.sqrt(covarArray[M,1,1]), #y0
+      valuesArray[M,2]+np.random.normal()*np.sqrt(covarArray[M,2,2]), #sigmax
+      valuesArray[M,3]+np.random.normal()*np.sqrt(covarArray[M,3,3]), #sigmay
+      valuesArray[M,4]+np.random.normal()*np.sqrt(covarArray[M,4,4]), #theta
+      valuesArray[M,5]+np.random.normal()*np.sqrt(covarArray[M,5,5])] #A
 
-sampler=emcee.EnsembleSampler(walkers,len(p0[0]),
-                      logPi,args=[fits[2].flatten(),
-                                  x.flatten(),y.flatten(),
-                                  weights[2].flatten()])
-pos, prob, state = sampler.run_mcmc(p0,100)
-sampler1.reset()
-pos, prob, state= sampler.run_mcmc(pos,N)
+  fakeData=gauss2d(x,y,*p0)
 
-end = time.time()
-print('Posterior Analysis: %0.2f'%(end - start))
+  result=gaussModel.fit(data=signals[M],
+                          weights=weights[M],
+                          x=x,y=y,
+                          x0=156,y0=177,
+                          sigmax=1,sigmay=1,
+                          theta=0,A=1)
+  sigma=np.sqrt(np.diag(result.covar))
+  #get the values out of the dictionary
+  valuesArray[i]=np.array([*result.best_values.values()])
+  #creates an array of fits
+  fits[i]=gauss2d(x,y,*valuesArray[i])
+
+
+
+## Using emcee
+#walkers=20
+#N=10000
+
+#Determine new parameters
+
+#p0= [[valuesArray[2,0]+np.random.normal()*np.sqrt(covarArray[2,0,0]),
+#      valuesArray[2,1]+np.random.normal()*np.sqrt(covarArray[2,1,1]),
+#      valuesArray[2,2]+np.random.normal()*np.sqrt(covarArray[2,2,2]),
+#      valuesArray[2,3]+np.random.normal()*np.sqrt(covarArray[2,3,3]),
+#      valuesArray[2,4]+np.random.normal()*np.sqrt(covarArray[2,4,4]),
+#      valuesArray[2,5]+np.random.normal()*np.sqrt(covarArray[2,5,5])]
+#      for w in range(walkers)]
+#start=time.time()
+#
+#sampler=emcee.EnsembleSampler(walkers,len(p0[0]),
+#                      logPi,args=[fits[2].flatten(),
+#                                  x.flatten(),y.flatten(),
+#                                  weights[2].flatten()])
+#pos, prob, state = sampler.run_mcmc(p0,100)
+#sampler.reset()
+#pos, prob, state= sampler.run_mcmc(pos,N)
+#
+#end = time.time()
+#print('Posterior Analysis: %0.2f'%(end - start))
+
+## Using
 
 #%%
 width,height=SP.setupPlot(singleColumn=False)
