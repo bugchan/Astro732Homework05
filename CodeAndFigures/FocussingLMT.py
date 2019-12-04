@@ -36,7 +36,10 @@ def gauss2d(x,y,x0,y0,sigmax,sigmay,theta,A):
   + (np.cos(theta)**2)/(2*sigmay**2)
   return A*np.exp(-a*(x-x0)**2-b*(x-x0)*(y-y0)-c*(y-y0)**2)
 
-def logPi(params,signal,x,y,weight):
+#def gauss2d(x,y,x0,y0,sigmax,sigmay,A):
+#  return A*np.exp((-(x-x0)**2)/(2*sigmax**2)-((y-y0)**2)/(2*sigmay**2))
+
+def logPi(params,x,y,signal,weight):
     chi=-((signal-gauss2d(x,y,*params))**2)*weight*0.5
     return chi.sum(axis=0)
 
@@ -74,13 +77,15 @@ start=time.time()
 
 gaussModel=lmfit.Model(gauss2d,
                        independent_vars=('x','y'),
-      param_names=paramslabels,
-      nan_policy='omit')
+                       param_names=paramslabels,
+                       nan_policy='omit')
 
 #initializes arrays
-valuesArray=np.zeros((5,6))
+ndim=6
+nmaps=5
+valuesArray=np.zeros((nmaps,ndim))
 fits=np.zeros(np.shape(signals))
-covarArray=np.zeros((5,6,6))
+covarArray=np.zeros((nmaps,ndim,ndim))
 
 for i in np.arange(5):
   result=gaussModel.fit(data=signals[i],
@@ -88,7 +93,7 @@ for i in np.arange(5):
                         x=x,y=y,
                         x0=156,y0=177,
                         sigmax=1,sigmay=1,
-                        theta=0,A=1)
+                        A=1)
   covarArray[i]=result.covar
   #get the values out of the dictionary
   valuesArray[i]=np.array([*result.best_values.values()])
@@ -104,6 +109,19 @@ print('Gauss Fit took ',(end-start))
 
 amps=valuesArray[:,-1]
 z=np.array([-3.0,-2.0,-1.0,0.0,1.0])
+
+#%% quadfit using SVD
+#Reminder of what we have Az*coeff=Amp
+start=time.time()
+zfit=np.linspace(-3,1,1000)
+Az=np.vander(z,N=3,increasing=True)
+Apinv=linalg.pinv(Az)
+quadCoeff=Apinv.dot(amps)
+quadcov=np.sqrt(1/np.diag(np.dot(Az.T,Az)))
+quadfitSVD=quadModel(zfit,*quadCoeff)
+
+end=time.time()
+print('Quad fit w/ SVD took ',(end-start))
 
 #%% quadFit using lmfit
 #start=time.time()
@@ -121,42 +139,29 @@ z=np.array([-3.0,-2.0,-1.0,0.0,1.0])
 #print('Quad fit with lmfit took ',(end-start))
 
 #%% posterior probability for fit1
-walkers=16
-N=1000
+walkers=20
+N=10000
 
-p0= [[valuesArray[1,0]+np.random.normal()*np.sqrt(covarArray[1,0,0]),
-      valuesArray[1,1]+np.random.normal()*np.sqrt(covarArray[1,1,1]),
-      valuesArray[1,2]+np.random.normal()*np.sqrt(covarArray[1,2,2]),
-      valuesArray[1,3]+np.random.normal()*np.sqrt(covarArray[1,3,3]),
-      valuesArray[1,4]+np.random.normal()*np.sqrt(covarArray[1,4,4]),
-      valuesArray[1,5]+np.random.normal()*np.sqrt(covarArray[1,5,5])]
+p0= [[valuesArray[2,0]+np.random.normal()*np.sqrt(covarArray[2,0,0]),
+      valuesArray[2,1]+np.random.normal()*np.sqrt(covarArray[2,1,1]),
+      valuesArray[2,2]+np.random.normal()*np.sqrt(covarArray[2,2,2]),
+      valuesArray[2,3]+np.random.normal()*np.sqrt(covarArray[2,3,3]),
+      valuesArray[2,4]+np.random.normal()*np.sqrt(covarArray[2,4,4]),
+      valuesArray[2,5]+np.random.normal()*np.sqrt(covarArray[2,5,5])]
       for w in range(walkers)]
-#p0= [np.random.multivariate_normal(coeff1,pcov1)
-#      for w in range(nwalkers)]
 
 start=time.time()
 
 sampler=emcee.EnsembleSampler(walkers,len(p0[0]),
-                      logPi,args=[signals[1],x,y,weights[1]])
-pos, prob, state = sampler.run_mcmc(p0,N)
-#sampler1.reset()
-#pos, prob, state= sampler.run_mcmc(pos,N)
+                      logPi,args=[fits[2].flatten(),
+                                  x.flatten(),y.flatten(),
+                                  weights[2].flatten()])
+pos, prob, state = sampler.run_mcmc(p0,100)
+sampler1.reset()
+pos, prob, state= sampler.run_mcmc(pos,N)
 
 end = time.time()
-print('Time to run: %0.2f'%(end - start))
-
-#%% quadfit using SVD
-#Reminder of what we have Az*coeff=Amp
-start=time.time()
-
-Az=np.vander(z,N=3,increasing=True)
-Apinv=linalg.pinv(Az)
-quadCoeff=Apinv.dot(amps)
-quadcov=np.sqrt(1/np.diag(np.dot(Az.T,Az)))
-quadfitSVD=quadModel(zfit,*quadCoeff)
-
-end=time.time()
-print('Quad fit w/ SVD took ',(end-start))
+print('Posterior Analysis: %0.2f'%(end - start))
 
 #%%
 width,height=SP.setupPlot(singleColumn=False)
@@ -185,7 +190,7 @@ for i in range(5):
   axs[2].set_aspect('equal')
   axs[2].set_xticks([])
   axs[2].set_yticks([])
-  
+
 
   fig.tight_layout()
   fig.colorbar(cmap1,ax=axs[0])
