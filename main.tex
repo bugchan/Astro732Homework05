@@ -60,7 +60,12 @@ linkbordercolor={0 0 1}}
 % \roman (i, ii, iii, ...)
 % \Roman (I, II, III, ...)
 \renewcommand\thesubsection{\thesection.\alph{subsection}}
-
+\renewcommand{\thefigure}{\thesection-\arabic{figure}}
+\counterwithin{figure}{section}
+\renewcommand{\thetable}{\thesection-\arabic{figure}}
+\counterwithin{table}{section}
+\renewcommand{\theequation}{\thesection-\arabic{figure}}
+\counterwithin{equation}{section}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %               TITLE LABELS
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
