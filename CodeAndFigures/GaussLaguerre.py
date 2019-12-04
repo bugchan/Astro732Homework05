@@ -4,10 +4,10 @@ Created on Sun Nov 24 14:11:21 2019
 
 @author: Sandra Bustamante
 
-Gauss=Laguerre
+Gauss-Laguerre
 Evaluate this integral using Gauss-Laguerre 
-quadrature for τ = 1, σt = 0.5 and at 100 points
-for t ∈ [−2, 6]. Use N=5, 10, 15, 20, and 30 knots 
+quadrature for \tau = 1, \sigma*t = 0.5 and at 100 points
+for t \in [−2, 6]. Use N=5, 10, 15, 20, and 30 knots 
 and compute both the relative and absolute
 error using the analytic solution.
 """
