@@ -146,7 +146,7 @@ print('Quad fit w/ SVD took ',(end-start))
 
 #%% posterior probability for fit1
 M=2
-niter=1000
+niter=10000
 
 posteriorParams=np.zeros((niter,ndim))
 posteriorChi=np.zeros(niter)
@@ -161,7 +161,7 @@ for i in range(niter):
                         x0=156,y0=177,sigmax=1,sigmay=1,theta=0,A=1)
   #get the values out of the dictionary
   posteriorParams[i]=np.array([*result.best_values.values()])
-  #calculate the chi sq. 
+  #calculate the chi sq.
   fit=gauss2d(x,y,*posteriorParams[i])
   posteriorChi[i]=(((signals[M]-fit)**2)*weights[M]*0.5).mean()
 
