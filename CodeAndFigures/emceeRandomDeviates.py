@@ -9,6 +9,7 @@ Created on Thu Nov 28 12:43:54 2019
 import numpy as np
 import emcee
 import matplotlib.pyplot as plt
+import SetupPlots as SP
 
 #%% Definitions
 def probx(x):
@@ -27,7 +28,7 @@ px=probx(x)
 
 meanx=np.pi/2
 sigmax=1
-N=10000
+N=100000
 #%% emcee
 ndim, nwalkers = 1, 100
 x0 = np.random.rand(nwalkers, ndim)*np.pi
@@ -39,11 +40,19 @@ pos, prob, state = sampler.run_mcmc(x0,100)
 sampler.reset()
 pos, prob, state = sampler.run_mcmc(pos,N)
 
-#%%
-
+#extract the samples of the distribution
 samples = sampler.flatchain
-hist=plt.hist(samples[:,0],100,density=True)
-plt.plot(x,probx(x),label='sinx/2')
-#plt.text(0,0.55,'AcceptanceRate:%1.2f'%sampler.acceptance_fraction.mean())
-#plt.xlim(-.5,np.pi+.5)
-plt.legend()
+
+#%% Plot 
+width,height=SP.setupPlot(singleColumn=False)
+
+fig,axs = plt.subplots(1,1,figsize=(width,height))
+hist=axs.hist(samples[:,0],100,density=True)
+axs.plot(x,probx(x),label='sinx/2')
+axs.set_xlabel('x')
+axs.set_ylabel('P(x)')
+axs.legend()
+axs.grid()
+
+fig.tight_layout()
+fig.savefig('emceeRandomDeviatesPlot.pdf')

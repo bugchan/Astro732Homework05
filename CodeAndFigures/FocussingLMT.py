@@ -19,7 +19,7 @@ import time
 import lmfit
 import SetupPlots as SP
 from scipy import linalg
-import emcee
+#import emcee
 import corner
 
 #%% Definitions
@@ -81,7 +81,7 @@ gaussModel=lmfit.Model(gauss2d,
                        nan_policy='omit')
 
 #initializes arrays
-ndim=6
+ndim=len(paramslabels)
 nmaps=len(signals)
 valuesArray=np.zeros((nmaps,ndim))
 fits=np.zeros(np.shape(signals))
@@ -111,14 +111,20 @@ amps=valuesArray[:,-1]
 z=np.array([-3.0,-2.0,-1.0,0.0,1.0])
 
 #%% quadfit using SVD
-#Reminder of what we have Az*coeff=Amp
 start=time.time()
-zfit=np.linspace(-3,1,1000)
+#Reminder of what we have Az*coeff=Amp
+#create A matrix
 Az=np.vander(z,N=3,increasing=True)
+#calculate pseudo inverse
 Apinv=linalg.pinv(Az)
+#find coeff and cov matrix
 quadCoeff=Apinv.dot(amps)
 quadcov=np.sqrt(1/np.diag(np.dot(Az.T,Az)))
+#generate fit data using coeff
+zfit=np.linspace(-3,1,1000)
 quadfitSVD=quadModel(zfit,*quadCoeff)
+#determine max of fit
+index=np.argmax(quadfitSVD)
 
 end=time.time()
 print('Quad fit w/ SVD took ',(end-start))
@@ -140,37 +146,29 @@ print('Quad fit w/ SVD took ',(end-start))
 
 #%% posterior probability for fit1
 M=2
-niter=100
+niter=1000
 
-posteriorParams=np.zeros(niter,ndim)
+posteriorParams=np.zeros((niter,ndim))
 posteriorChi=np.zeros(niter)
+
+start=time.time()
 
 for i in range(niter):
   #paramslabels=['x0','y0','sigmax','sigmay','theta','A']
-  p0= [valuesArray[M,0]+np.random.normal()*np.sqrt(covarArray[M,0,0]),#x0
-      valuesArray[M,1]+np.random.normal()*np.sqrt(covarArray[M,1,1]), #y0
-      valuesArray[M,2]+np.random.normal()*np.sqrt(covarArray[M,2,2]), #sigmax
-      valuesArray[M,3]+np.random.normal()*np.sqrt(covarArray[M,3,3]), #sigmay
-      valuesArray[M,4]+np.random.normal()*np.sqrt(covarArray[M,4,4]), #theta
-      valuesArray[M,5]+np.random.normal()*np.sqrt(covarArray[M,5,5])] #A
-
+  p0=valuesArray[M]+np.random.normal(size=ndim)
   fakeData=gauss2d(x,y,*p0)
-
-  result=gaussModel.fit(data=signals[M],
-                          weights=weights[M],
-                          x=x,y=y,
-                          x0=156,y0=177,
-                          sigmax=1,sigmay=1,
-                          theta=0,A=1)
-  sigma=np.sqrt(np.diag(result.covar))
+  result=gaussModel.fit(data=fakeData,x=x,y=y,
+                        x0=156,y0=177,sigmax=1,sigmay=1,theta=0,A=1)
   #get the values out of the dictionary
-  valuesArray[i]=np.array([*result.best_values.values()])
-  #creates an array of fits
-  fits[i]=gauss2d(x,y,*valuesArray[i])
+  posteriorParams[i]=np.array([*result.best_values.values()])
+  #calculate the chi sq. 
+  fit=gauss2d(x,y,*posteriorParams[i])
+  posteriorChi[i]=(((signals[M]-fit)**2)*weights[M]*0.5).mean()
 
+end=time.time()
+print('Posterior analysis took ',(end-start))
 
-
-## Using emcee
+#%% Using emcee
 #walkers=20
 #N=10000
 
@@ -195,8 +193,6 @@ for i in range(niter):
 #
 #end = time.time()
 #print('Posterior Analysis: %0.2f'%(end - start))
-
-## Using
 
 #%%
 width,height=SP.setupPlot(singleColumn=False)
@@ -237,12 +233,24 @@ for i in range(5):
 width,height=SP.setupPlot(singleColumn=False)
 fig,axs = plt.subplots(1,1,figsize=(width,height))
 axs.errorbar(z,amps,yerr=2*np.sqrt(covarArray[:,5,5]),fmt='.',label='Data Points')
-axs.plot(zfit,quadfitResult,label='LM fit')
+#axs.plot(zfit,quadfitResult,label='LM fit')
 axs.plot(zfit,quadfitSVD,label='SVD fit')
-axs.plot(zfit[index],quadfitResult[index],'*',label='z: %1.2f mm'%zfit[index])
+axs.plot(zfit[index],quadfitSVD[index],'*',label='z: %1.2f mm'%zfit[index])
 axs.legend()
 axs.set_xlabel('mm')
 axs.set_ylabel('Amplitude')
 axs.grid()
 
 fig.savefig('QuadFitPlot.pdf')
+
+#%%
+width,height=SP.setupPlot(singleColumn=True)
+
+fig1 = corner.corner(posteriorParams,
+                    labels=paramslabels,
+                    show_titles=True,
+                    color='C0',
+                    #levels=(0.683,0.95),
+                    )
+fig1.set_size_inches((width,width))
+fig1.savefig('FocusingLMTPosteriorCorner.pdf')
