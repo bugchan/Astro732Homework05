@@ -18,9 +18,9 @@ where
     b=-\frac{\sin 2\theta}{2\sigma_x^2}+\frac{\sin 2\theta}{2\sigma_y^2},\\
     c=\frac{\sin^2\theta}{2\sigma_x^2}+\frac{\cos^2\theta}{2\sigma_y^2},
 \end{align}
-$A$ is the amplitude, $(x_0,y_0)$ is the center of the peak and $\theta$ is a rotation angle.
+$A$ is the amplitude, $(x_0,y_0)$ is the center of the peak, $\sigma_x,\sigma_y$ are the width of the peak and $\theta$ is a rotation angle.
 
-Using the lmfit python package we can use LM method to find the best parameters that minimizes the $\chi^2$ function for the 2D Gaussian. To do so, we first define \lstinline{lmfit.Model()} to use the 2D Gaussian definition specifying the independent variables $x$ and $y$, and the parameter labels. After defining the model, we use \lstinline{lmfit.Model.fit} to fit each of the maps using the weight maps and initial estimate of all parameters.The result are the best values of the parameters that minimizes the $\chi^2$ function. 
+Using the lmfit package we can apply the LM method to find the parameters that minimizes the $\chi^2$ function for the 2D Gaussian. To do so, we first define \lstinline{lmfit.Model()} to use the 2D Gaussian definition specifying the independent variables $x$ and $y$, and the parameter labels. After defining the model, we use \lstinline{lmfit.Model.fit} to fit each of the maps using the weight maps and initial estimate of all parameters.The result are the best values of the parameters that minimizes the $\chi^2$ function. 
 Figure \ref{fig:lmtRaw} shows the raw maps, the fitted map using the best values of the parameters $A,x_0,y_0,\sigma_x,\sigma_y,$ and $\theta$ and a map of the residuals, $raw-fit$. 
 
 Once we have the best fit parameters for each map, we extract the amplitude, $A$ for each map and plot it against the z-position of the secondary mirror. This set of data will be fitted to a quadratic model described by,
@@ -29,19 +29,19 @@ Once we have the best fit parameters for each map, we extract the amplitude, $A$
 \end{equation}
 where $z$ is the z-position of the secondary mirror as given in Table \ref{tab:LMTmaps}. 
 
-After this we plot the amplitude obtained from the best fit and its corresponding z-position of the secondary mirror. 
+Noting that the quadratic model is linear in its parameters, we choose to do the fit using the least squares method with SVD. From this fit, we obtained the maximum value and select its corresponding z-position as the best position for the secondary mirror. Figure \ref{fig:lmtquadfit} shows the pair of amplitude of the Gaussian fit with respect the z position of the secondary mirror alongside the least square fit using SVD and the best z-position for the secondary mirror, which for this case is \SI{-0.57}{\milli\m}.
 
 % The data is stored in the file maps.tar.gz on the class Moodle page. You can unpack that on a linux computer with the commands: gunzip maps.tar.gz and tar -xcv maps.tar. This will give you a set of 10 fits files (remember fits from homework 1) that you will read. The files with “signal” in the name are the maps of the source. The files with "weight" in the name are images with each pixel representing the weight $(1/\sigma^2)$ of each pixel in the corresponding signal map.
 
-Putting all this together, use the lmfit Levenberg-Marquardt fitting package to fit each image to a 2-d gaussian. 
-Find the best fit amplitude in each case and fit the best fit amplitudes to the function
-\begin{equation}
-    f(z)=a_0+a_1z+a_2z^2
-\end{equation}
-where z is the z-position of the secondary as given in the table below.
+% Putting all this together, use the lmfit Levenberg-Marquardt fitting package to fit each image to a 2-d gaussian. 
+% Find the best fit amplitude in each case and fit the best fit amplitudes to the function
+% \begin{equation}
+%     f(z)=a_0+a_1z+a_2z^2
+% \end{equation}
+% where z is the z-position of the secondary as given in the table below.
 
-Use the results of this
-fit to determine the best-fit position of the LMT's secondary mirror.
+% Use the results of this
+% fit to determine the best-fit position of the LMT's secondary mirror.
 
 \begin{table}[h]
     \centering
@@ -100,11 +100,19 @@ fit to determine the best-fit position of the LMT's secondary mirror.
 \begin{figure}
     \centering
     \includegraphics{CodeAndFigures/QuadFitPlot.pdf}
-    \caption{Caption}
+    \caption{Plot of the amplitude obtain by LM method from each maps vs the corresponding z-position of the secondary mirror. }
     \label{fig:lmtquadfit}
 \end{figure}
 
 \subsection{}
 
-Use either the procedure outlined in the class18 notes or the emcee python package to simulate the posterior probability distributions for all of the fitted parameters
-in one of the 2-d gaussian fits you did. Describe what you see.
+
+Use either the procedure outlined in the class18 notes or the emcee python package to simulate the posterior probability distributions for all of the fitted parameters in one of the 2-d gaussian fits you did. Describe what you see.
+
+\begin{figure}
+    \centering
+    \includegraphics{code}
+    \caption{Caption}
+    \label{fig:my_label}
+\end{figure}
+
