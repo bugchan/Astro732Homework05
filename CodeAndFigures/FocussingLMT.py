@@ -169,7 +169,10 @@ for i in range(niter):
 
 end=time.time()
 
-np.savez('PosteriorData',params=posteriorParams,Chi=posteriorChi)
+np.savez('PosteriorData',
+         params=posteriorParams,
+         Chi=posteriorChi,
+         truths=ValuesArray)
 
 print('Posterior analysis took ',(end-start))
 
@@ -250,6 +253,14 @@ fig.savefig('QuadFitPlot.pdf')
 #%%
 width,height=SP.setupPlot(singleColumn=True)
 
+#load data already saved to avoid running the full code.
+data=np.load('PosteriorData.npz')
+posteriorParams=data['params']
+posteriorChi=data['Chi']
+#valuesArray=data['truths']
+ndim=6
+valuesArray=[154.51,178.55,4.35,4.77,0.59,0.88]
+
 #paramslabels=['x0','y0','sigmax','sigmay','theta','A']
 fig1 = corner.corner(posteriorParams,
                     labels=[r'$x_0$',r'$y_0$',r'$\sigma_x$',r'$\sigma_y$',
@@ -257,8 +268,9 @@ fig1 = corner.corner(posteriorParams,
                     show_titles=True,
                     color='C0',
                     label_kwargs={"fontsize": 12,'labelpad':100},
-                    truths=valuesArray[M],truth_color='C1',
+                    truths=valuesArray,truth_color='C1',
                     max_n_ticks=4,
+                    weights=posteriorChi,
                     #levels=(0.683,0.95),
                     )
 fig1.set_size_inches((width,width))
