@@ -146,26 +146,31 @@ print('Quad fit w/ SVD took ',(end-start))
 
 #%% posterior probability for fit1
 M=2
-niter=10000
+niter=5000
 
 posteriorParams=np.zeros((niter,ndim))
 posteriorChi=np.zeros(niter)
 
 start=time.time()
 
+p0=np.random.multivariate_normal(mean=valuesArray[M],
+                       cov=np.diag(np.sqrt(np.diag(covarArray[M]))),
+                       size=niter)
 for i in range(niter):
   #paramslabels=['x0','y0','sigmax','sigmay','theta','A']
-  p0=valuesArray[M]+np.random.normal(size=ndim)
-  fakeData=gauss2d(x,y,*p0)
+  fakeData=gauss2d(x,y,*p0[i])
   result=gaussModel.fit(data=fakeData,x=x,y=y,
                         x0=156,y0=177,sigmax=1,sigmay=1,theta=0,A=1)
   #get the values out of the dictionary
   posteriorParams[i]=np.array([*result.best_values.values()])
-  #calculate the chi sq.
+  #calculate the chi sq. 
   fit=gauss2d(x,y,*posteriorParams[i])
   posteriorChi[i]=(((signals[M]-fit)**2)*weights[M]*0.5).mean()
 
 end=time.time()
+
+np.savez('PosteriorData',params=posteriorParams,Chi=posteriorChi)
+
 print('Posterior analysis took ',(end-start))
 
 #%% Using emcee
@@ -222,7 +227,6 @@ for i in range(5):
   axs[2].set_xticks([])
   axs[2].set_yticks([])
 
-
   fig.tight_layout()
   fig.colorbar(cmap1,ax=axs[0])
   fig.colorbar(cmap2,ax=axs[1])
@@ -246,11 +250,34 @@ fig.savefig('QuadFitPlot.pdf')
 #%%
 width,height=SP.setupPlot(singleColumn=True)
 
+#paramslabels=['x0','y0','sigmax','sigmay','theta','A']
 fig1 = corner.corner(posteriorParams,
-                    labels=paramslabels,
+                    labels=[r'$x_0$',r'$y_0$',r'$\sigma_x$',r'$\sigma_y$',
+                            r'$\theta$','A'],
                     show_titles=True,
                     color='C0',
+                    label_kwargs={"fontsize": 12,'labelpad':100},
+                    truths=valuesArray[M],truth_color='C1',
+                    max_n_ticks=4,
                     #levels=(0.683,0.95),
                     )
 fig1.set_size_inches((width,width))
+axes = np.array(fig1.axes).reshape(6,6)
+
+# Loop over the histograms
+for yi in range(ndim):
+    for xi in range(yi):
+        ax = axes[yi, xi]
+        ax.tick_params(labelsize=7,pad=0)
+        #ax.xaxis.labelpad = 100
 fig1.savefig('FocusingLMTPosteriorCorner.pdf')
+
+#%%
+width,height=SP.setupPlot(singleColumn=False)
+histx=np.random.multivariate_normal(mean=valuesArray[M],
+                       cov=np.diag(np.sqrt(np.diag(covarArray[M]))),
+                       size=niter)
+fig,axs = plt.subplots(6,1,figsize=(width,6*height))
+for i in range(6):
+    axs[i].hist(histx[:,i].reshape(niter),bins=100,label=paramslabels[i])
+    axs[i].legend()
