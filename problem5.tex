@@ -37,6 +37,8 @@ If the acceptance rate is less than 23.4\%, we decrease the width otherwise we i
 
 Figure \ref{fig:LinearHastings} shows the joint posterior probability distribution and marginalized posterior probability distribution of the parameters $a_0$ and $a_1$ of the linear model described by equation \ref{eq:linearModel}. 
 
+Note that both histograms of our parameters show a gaussian distribution and the joint posterior probability shows that our parameters are highly correlated since a change in one will have an effect in the other one. The contours show the 68.3\% and 95\% confidence intervals for the two parameters.
+
 % Write a simple MetropolisHastings MCMC to fit the data from linfit data.npz to the linear function
 % \begin{equation}
 %     f(\Vec{x}|\Vec{a})=a_0 + a_1\Vec{x}
@@ -48,6 +50,6 @@ Figure \ref{fig:LinearHastings} shows the joint posterior probability distributi
 \begin{figure}
     \centering
     \includegraphics{CodeAndFigures/LinearModelMetropolisHastings.pdf}
-    \caption{Caption}
+    \caption{Joint posterior probability distribution and marginalized posterior probability for the parameters $a_0$ and $a_1$ from the model described in equation \ref{eq:linearModel}}
     \label{fig:LinearHastings}
 \end{figure}
