@@ -1,4 +1,4 @@
-\section{Metropolis-Hastings \\ MCMC (linear model)}
+\section{Metropolis-Hastings MCMC (linear model)}
 
 For this exercise, our data can be described by a linear function given by,
 \begin{equation}
@@ -19,7 +19,11 @@ The implementation of this algorithm is the following:
     \item Assuming that both the candidate and the previous values come from the same proposal distribution, then we can determine the acceptance probability given by 
     \begin{equation}
         \alpha(a_{i-1}|a{ic})=\min\left(1,\frac{\pi(a_ic)}{\pi(a_{i-1})}\right)
-    \end{equation} where $\pi(a)=\prod^N_{i=1}e^{-\left(\frac{(y-model)^2}{2\sigma^2}\right)}$.
+    \end{equation} where
+    \begin{equation}
+        \pi(a)=\prod^N_{i=1}e^{-\left(\frac{(y-model)^2}{2\sigma^2}\right)}.
+        \label{eq:piMCMC}
+    \end{equation}
     \item Draw a uniform random deviate and compare it with $\alpha(a_{i-1}|a{ic})$. If $u<\alpha$ then accept the candidate by making $a_i=a_c$, else reject the candidate by $a_i=a_{i-1}$.
     \item Repeat until you have enough samples.
 \end{itemize}
@@ -37,7 +41,7 @@ If the acceptance rate is less than 23.4\%, we decrease the width otherwise we i
 
 Figure \ref{fig:LinearHastings} shows the joint posterior probability distribution and marginalized posterior probability distribution of the parameters $a_0$ and $a_1$ of the linear model described by equation \ref{eq:linearModel}. 
 
-Note that both histograms of our parameters show a gaussian distribution and the joint posterior probability shows that our parameters are highly correlated since a change in one will have an effect in the other one. The contours show the 68.3\% and 95\% confidence intervals for the two parameters.
+Note that both histograms of our parameters show a normal distribution and the joint posterior probability shows that our parameters are highly correlated since a change in one will have an effect in the other one. The contours show the 68.3\% and 95\% confidence intervals for the two parameters.
 
 % Write a simple MetropolisHastings MCMC to fit the data from linfit data.npz to the linear function
 % \begin{equation}
@@ -50,6 +54,6 @@ Note that both histograms of our parameters show a gaussian distribution and the
 \begin{figure}
     \centering
     \includegraphics{CodeAndFigures/LinearModelMetropolisHastings.pdf}
-    \caption{Joint posterior probability distribution and marginalized posterior probability for the parameters $a_0$ and $a_1$ from the model described in equation \ref{eq:linearModel}}
+    \caption{Joint posterior probability distribution and marginalized posterior probability for the parameters $a_0$ and $a_1$ from the model described in equation \ref{eq:linearModel}.}
     \label{fig:LinearHastings}
 \end{figure}
