@@ -34,7 +34,7 @@ ndim, nwalkers = 1, 100
 x0 = np.random.rand(nwalkers, ndim)*np.pi
 
 sampler = emcee.EnsembleSampler(nwalkers, ndim,
-                                logPi,a=10)
+                                logPi,a=2)
 
 pos, prob, state = sampler.run_mcmc(x0,100)
 sampler.reset()

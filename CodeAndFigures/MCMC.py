@@ -93,9 +93,7 @@ coeff1,pcov1=opt.curve_fit(linearModel,x1,y1,sigma=sigma1)
 #start with pcov as width and then optimize according to acceptance rate = 23.4
 N=10000
 nwalkers1=20
-#width=4.9*np.sqrt(np.diag(pcov1))
 width=4.9*pcov1
-accept=0
 
 aArray1=MCMCHastings(nwalkers1*N,width,
                      coeff1,linearModel,x1,y1,sigma1)
@@ -168,7 +166,7 @@ coeff2,pcov2=opt.curve_fit(gaussModel,x2,y2,sigma=sigma2)
 N=10000
 nwalkers2=20
 width=1.65*pcov2
-accept=0
+
 
 aArray2=MCMCHastings(N*nwalkers2,width,
                      coeff2,gaussModel,x2,y2,sigma2)
