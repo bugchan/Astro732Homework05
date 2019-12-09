@@ -23,6 +23,7 @@
 \usepackage{pdfpages}
 \usepackage{booktabs} % For \toprule, \midrule and \bottomrule
 \usepackage{pgfplotstable} % Generates table from .csv
+\usepackage{sectsty} %use to help with long titles
 \pgfplotsset{compat=1.16}
 % Setup siunitx:
  \sisetup{
@@ -60,12 +61,18 @@ linkbordercolor={0 0 1}}
 % \roman (i, ii, iii, ...)
 % \Roman (I, II, III, ...)
 \renewcommand\thesubsection{\thesection.\alph{subsection}}
+
+%redefines so that every section has its on counter so figures,
+%tables and equation can have the chapter.counter.
 \renewcommand{\thefigure}{\thesection-\arabic{figure}}
 \counterwithin{figure}{section}
 \renewcommand{\thetable}{\thesection-\arabic{figure}}
 \counterwithin{table}{section}
 \renewcommand{\theequation}{\thesection-\arabic{figure}}
 \counterwithin{equation}{section}
+
+%redefines titles to be able to handle long titles.
+\allsectionsfont{\raggedright}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %               TITLE LABELS
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

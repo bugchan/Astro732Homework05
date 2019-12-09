@@ -44,7 +44,7 @@ Noting that the quadratic model is linear in its parameters, we choose to do the
 % Use the results of this
 % fit to determine the best-fit position of the LMT's secondary mirror.
 
-\begin{table}[h]
+\begin{table}[ht]
     \centering
     \begin{tabular}{|c|c|}
         \toprule
@@ -63,31 +63,31 @@ Noting that the quadratic model is linear in its parameters, we choose to do the
 
 \begin{figure}
     \centering
-    \begin{subfigure}[b]{.45\textwidth}
+    \begin{subfigure}[b]{.49\textwidth}
         \centering
         \includegraphics[height=100pt]{CodeAndFigures/DataFits4.pdf}
         \caption{Data:35114}
         \label{fig:lmtFit4}
     \end{subfigure}
-    \begin{subfigure}[b]{.45\textwidth}
+    \begin{subfigure}[b]{.49\textwidth}
         \centering
         \includegraphics[height=100pt]{CodeAndFigures/DataFits5.pdf}
         \caption{Data:35115}
         \label{fig:lmtFit5}
     \end{subfigure}
-    \begin{subfigure}[b]{.45\textwidth}
+    \begin{subfigure}[b]{.49\textwidth}
         \centering
         \includegraphics[height=100pt]{CodeAndFigures/DataFits6.pdf}
         \caption{Data:35116}
         \label{fig:lmtFit6}
     \end{subfigure}
-    \begin{subfigure}[b]{.45\textwidth}
+    \begin{subfigure}[b]{.49\textwidth}
         \centering
         \includegraphics[height=100pt]{CodeAndFigures/DataFits7.pdf}
         \caption{Data:35117}
         \label{fig:lmtFit7}
     \end{subfigure}
-    \begin{subfigure}[b]{.45\textwidth}
+    \begin{subfigure}[b]{.49\textwidth}
         \centering
         \includegraphics[height=100pt]{CodeAndFigures/DataFits8.pdf}
         \caption{Data:35118}
@@ -108,16 +108,21 @@ Noting that the quadratic model is linear in its parameters, we choose to do the
 \subsection{}
 % Use either the procedure outlined in the class18 notes or the emcee python package to simulate the posterior probability distributions for all of the fitted parameters in one of the 2-d gaussian fits you did. Describe what you see.
 
-We can use a posterior probability distribution of the fitted parameters to estimate the uncertainty in the fit. We start with the best fit parameters from MAP 35116 (Table \ref{tab:lmtMap2}). To do the posterior analysis we do the following
+We can use a posterior probability distribution of the fitted parameters to estimate the uncertainty in the fit. We start with the best fit parameters from MAP 35116 (Table \ref{tab:lmtMap2}). To do so, we do the following:
 \begin{itemize}
     % \item From our data find the best fit parameters.
     \item Using the best fit parameters simulate N data sets were we randomize new parameters from normal distributions that has the best fit parameters as their mean.
     \item Find the new best fit parameters for the simulated data sets.
 \end{itemize}
 
-Figure \ref{fig:lmtpostAna} shows an histogram for each of the parameter and the posterior probability. 
+Figure \ref{fig:lmtpostAna} shows the posterior joint posterior probability and the marginalized posterior probability. 
+We can note that our histograms for the center coordinates, rotation angle and amplitude resemble a normal distribution. 
+In contrast, $\sigma_x$ and $\sigma_y$ show a double peak distribution where the maximum peak is where the best fit parameters are located. 
+Nonetheless, I'm not sure what that means other than they seem to be not normal distributed.  
+The rotation angle seems to be unimportant for our fit which makes sense since every 90 degrees the axis values will either flip or repeat. In addition since we are interested in maximizing the amplitude of the 2D Gaussian the rotation doesn't affect us.
+Finally, the amplitude and the center coordinates are uncorrelated with each other. 
 
-\begin{table}[h]
+\begin{table}[ht]
     \centering
     \begin{tabular}{|c|c|}
         \toprule
